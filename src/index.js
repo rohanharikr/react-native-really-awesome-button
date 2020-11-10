@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
   View,
+  Pressable,
   Animated,
   ViewPropTypes
 } from "react-native";
@@ -113,7 +114,7 @@ export default class Button extends React.Component {
     this.animatedValue = new Animated.Value(0);
     this.animatedLoading = new Animated.Value(0);
     this.animatedOpacity = new Animated.Value(
-      props.width === null && !props.stretch == true ? 0 : 1
+        props.width === null && !props.stretch == true ? 0 : 1
     );
     this.layouted = null;
     this.animating = false;
@@ -182,9 +183,9 @@ export default class Button extends React.Component {
 
   pressIn = () => {
     if (
-      this.props.disabled === true ||
-      !this.props.children ||
-      this.animating === true
+        this.props.disabled === true ||
+        !this.props.children ||
+        this.animating === true
     ) {
       return false;
     }
@@ -212,17 +213,17 @@ export default class Button extends React.Component {
     });
   };
 
-  pressOut = event => {
+  //EDIT from original piece
+  //Needs a duplicate function as pressOut is called on buttons regardless of if the button was pressed or cancelled
+  //pressOut releases the animation without triggering the button and pressActivated activates the button.
+  //VERY simple change but very effective.
+  pressActivated = event => {
     if (
-      this.props.disabled === true ||
-      !this.props.children ||
-      this.progressing === true
+        this.props.disabled === true ||
+        !this.props.children ||
+        this.progressing === true
     ) {
       return false;
-    }
-    if (event.nativeEvent && event.nativeEvent.contentOffset) {
-      this.release();
-      return;
     }
     if (this.animating === true) {
       this.progressing = true;
@@ -231,11 +232,30 @@ export default class Button extends React.Component {
     }
     if (this.pressing === false) {
       this.press();
-      this.release();
       return;
     }
     this.timeout = setTimeout(() => {
       this.press();
+    }, ANIMATED_TIMING_OFF / 2.5);
+  }
+
+  pressOut = event => {
+    if (
+        this.props.disabled === true ||
+        !this.props.children ||
+        this.progressing === true
+    ) {
+      return false;
+    }
+    if (this.animating === true) {
+      this.progressing = true;
+      return;
+    }
+    if (this.pressing === false) {
+      this.release();
+      return;
+    }
+    this.timeout = setTimeout(() => {
       this.release();
     }, ANIMATED_TIMING_OFF / 2.5);
   };
@@ -244,24 +264,24 @@ export default class Button extends React.Component {
     if (this.props.progress === true) {
       // this.animating = true;
       this.setState(
-        {
-          activity: true
-        },
-        () => {
-          this.animateLoadingStart();
-          animateTiming({
-            variable: this.loadingOpacity,
-            toValue: 1
-          });
-          animateElastic({
-            variable: this.textOpacity,
-            toValue: 0
-          });
-          animateElastic({
-            variable: this.activityOpacity,
-            toValue: 1
-          });
-        }
+          {
+            activity: true
+          },
+          () => {
+            this.animateLoadingStart();
+            animateTiming({
+              variable: this.loadingOpacity,
+              toValue: 1
+            });
+            animateElastic({
+              variable: this.textOpacity,
+              toValue: 0
+            });
+            animateElastic({
+              variable: this.activityOpacity,
+              toValue: 1
+            });
+          }
       );
     }
     if (this.props.onPress) {
@@ -357,8 +377,8 @@ export default class Button extends React.Component {
     this.containerWidth = event.nativeEvent.layout.width;
     if (this.props.width === null && !this.props.stretch == true) {
       if (
-        this.state.width !== event.nativeEvent.layout.width &&
-        this.state.width < event.nativeEvent.layout.width
+          this.state.width !== event.nativeEvent.layout.width &&
+          this.state.width < event.nativeEvent.layout.width
       ) {
         this.setState({
           width: event.nativeEvent.layout.width
@@ -381,41 +401,41 @@ export default class Button extends React.Component {
 
     if (!children) {
       return (
-        <Animated.View
-          testID="aws-btn-content-placeholder"
-          style={[
+          <Animated.View
+      testID="aws-btn-content-placeholder"
+      style={[
             styles.container__placeholder,
-            dynamicStyles.container__placeholder,
-            animatedStyles
-          ]}
-        />
-      );
+        dynamicStyles.container__placeholder,
+        animatedStyles
+    ]}
+      />
+    );
     }
     if (typeof children === "string") {
       return (
-        <Animated.Text
-          testID="aws-btn-content-text"
-          style={[
+          <Animated.Text
+      testID="aws-btn-content-text"
+      style={[
             styles.container__text,
-            dynamicStyles.container__text,
-            animatedStyles
-          ]}
-        >
-          {children}
-        </Animated.Text>
-      );
+        dynamicStyles.container__text,
+        animatedStyles
+    ]}
+    >
+      {children}
+    </Animated.Text>
+    );
     }
     return (
-      <Animated.View
-        style={[
+        <Animated.View
+    style={[
           styles.container__view,
-          dynamicStyles.container__view,
-          animatedStyles
-        ]}
-      >
-        {children}
-      </Animated.View>
-    );
+      dynamicStyles.container__view,
+      animatedStyles
+  ]}
+  >
+    {children}
+  </Animated.View>
+  );
   }
 
   render() {
@@ -427,80 +447,84 @@ export default class Button extends React.Component {
     const { ExtraContent, style, activityColor } = this.props;
 
     return (
-      <TouchableWithoutFeedback
-        testID="aws-btn-content-view"
-        onPressIn={this.pressIn}
-        onPressOut={this.pressOut}
-      >
-        <Animated.View
-          testID="aws-btn-content-2"
-          style={[
-            styles.container,
-            dynamicStyles.container,
-            animatedValues.animatedContainer,
-            style
-          ]}
+        <Pressable
+    testID="aws-btn-content-view"
+    style={{flex:1, justifyContent:"center", alignItems:"center"}}
+    onPressIn={this.pressIn}
+    onPress={this.pressActivated()}
+    onPressOut={this.pressOut}
+    delayPressIn={0}
+    delayPressOut={0}
         >
-          <Animated.View
-            testID="aws-btn-shadow"
-            style={[
-              styles.shadow,
-              dynamicStyles.shadow,
-              animatedValues.animatedShadow
-            ]}
-          />
-          <View
-            testID="aws-btn-bottom"
-            style={[styles.bottom, dynamicStyles.bottom]}
-          />
-          <Animated.View
-            testID="aws-btn-content"
-            style={[
-              styles.content,
-              dynamicStyles.content,
-              animatedValues.animatedContent
-            ]}
-          >
-            <View
-              testID="aws-btn-text"
-              style={[styles.text, dynamicStyles.text]}
-              onLayout={this.textLayout}
-            >
-              {ExtraContent}
-              <Animated.View
-                testID="aws-btn-active-background"
-                style={[
-                  styles.activeBackground,
-                  dynamicStyles.activeBackground,
-                  animatedValues.animatedActive
-                ]}
-              />
-              {this.state.activity === true && (
-                <Fragment>
-                  <Animated.View
-                    testID="aws-btn-progress"
-                    style={[
-                      styles.progress,
-                      dynamicStyles.progress,
-                      animatedValues.animatedProgress
-                    ]}
-                  />
-                  <Animated.View
-                    testID="aws-btn-activity-indicator"
-                    style={[
-                      styles.container__activity,
-                      animatedValues.animatedActivity
-                    ]}
-                  >
-                    <ActivityIndicator color={activityColor} />
-                  </Animated.View>
-                </Fragment>
-              )}
-              {this.renderContent(dynamicStyles)}
-            </View>
-          </Animated.View>
-        </Animated.View>
-      </TouchableWithoutFeedback>
-    );
+        <Animated.View
+    testID="aws-btn-content-2"
+    style={[
+          styles.container,
+      dynamicStyles.container,
+      animatedValues.animatedContainer,
+      style
+  ]}
+  >
+  <Animated.View
+    testID="aws-btn-shadow"
+    style={[
+          styles.shadow,
+      dynamicStyles.shadow,
+      animatedValues.animatedShadow
+  ]}
+    />
+    <View
+    testID="aws-btn-bottom"
+    style={[styles.bottom, dynamicStyles.bottom]}
+    />
+    <Animated.View
+    testID="aws-btn-content"
+    style={[
+          styles.content,
+      dynamicStyles.content,
+      animatedValues.animatedContent
+  ]}
+  >
+  <View
+    testID="aws-btn-text"
+    style={[styles.text, dynamicStyles.text]}
+    onLayout={this.textLayout}
+        >
+        {ExtraContent}
+        <Animated.View
+    testID="aws-btn-active-background"
+    style={[
+          styles.activeBackground,
+      dynamicStyles.activeBackground,
+      animatedValues.animatedActive
+  ]}
+    />
+    {this.state.activity === true && (
+    <Fragment>
+    <Animated.View
+      testID="aws-btn-progress"
+      style={[
+            styles.progress,
+        dynamicStyles.progress,
+        animatedValues.animatedProgress
+    ]}
+      />
+      <Animated.View
+      testID="aws-btn-activity-indicator"
+      style={[
+            styles.container__activity,
+        animatedValues.animatedActivity
+    ]}
+    >
+    <ActivityIndicator color={activityColor} />
+    </Animated.View>
+    </Fragment>
+    )}
+    {this.renderContent(dynamicStyles)}
+  </View>
+    </Animated.View>
+    </Animated.View>
+    </Pressable>
+  );
   }
 }
