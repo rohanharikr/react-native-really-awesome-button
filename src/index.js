@@ -451,7 +451,7 @@ export default class Button extends React.Component {
     testID="aws-btn-content-view"
     style={{flex:1, justifyContent:"center", alignItems:"center"}}
     onPressIn={this.pressIn}
-    onPress={this.pressActivated()}
+    onPress={this.pressActivated}
     onPressOut={this.pressOut}
     delayPressIn={0}
     delayPressOut={0}
