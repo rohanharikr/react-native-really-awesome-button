@@ -6,16 +6,16 @@
   "typings": "./index.d.ts",
   "author": "Rafael Caferati",
   "license": "MIT",
-  "homepage": "https://github.com/rcaferati/react-native-really-awesome-button",
+  "homepage": "https://github.com/rohanharikr/react-native-really-awesome-button.git",
   "scripts": {
     "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rcaferati/react-native-really-awesome-button"
+    "url": "https://github.com/rohanharikr/react-native-really-awesome-button.git"
   },
   "bugs": {
-    "url": "https://github.com/rcaferati/react-native-really-awesome-button/issues"
+    "url": "https://github.com/rohanharikr/react-native-really-awesome-button.git/issues"
   },
   "keywords": [
     "button",
