@@ -449,7 +449,7 @@ export default class Button extends React.Component {
     return (
         <Pressable
     testID="aws-btn-content-view"
-    style={{flex:1, justifyContent:"center", alignItems:"center"}}
+    // style={{flex:1, justifyContent:"center", alignItems:"center"}}
     onPressIn={this.pressIn}
     onPress={this.pressActivated}
     onPressOut={this.pressOut}
